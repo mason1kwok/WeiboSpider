@@ -2,12 +2,12 @@
 import pymongo
 from pymongo.errors import DuplicateKeyError
 from sina.items import RelationshipsItem, TweetsItem, InformationItem, CommentItem
-from sina.settings import LOCAL_MONGO_HOST, LOCAL_MONGO_PORT, DB_NAME
+from sina.settings import DB_NAME, MONGO_URI
 
 
 class MongoDBPipeline(object):
     def __init__(self):
-        client = pymongo.MongoClient(LOCAL_MONGO_HOST, LOCAL_MONGO_PORT)
+        client = pymongo.MongoClient(MONGO_URI)
         db = client[DB_NAME]
         self.Information = db["Information"]
         self.Tweets = db["Tweets"]

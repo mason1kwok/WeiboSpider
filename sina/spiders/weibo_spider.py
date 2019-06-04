@@ -110,7 +110,7 @@ class WeiboSpider(Spider):
             all_page = re.search(r'/>&nbsp;1/(\d+)页</div>', response.text)
             if all_page:
                 all_page = all_page.group(1)
-                all_page = int(all_page)
+                all_page = min(int(all_page), 10)
                 for page_num in range(2, all_page + 1):
                     page_url = response.url.replace('page=1', 'page={}'.format(page_num))
                     yield Request(page_url, self.parse_tweet, dont_filter=True, meta=response.meta)
@@ -219,6 +219,7 @@ class WeiboSpider(Spider):
             relationships_item["followed_id"] = uid
             relationships_item["_id"] = ID + '-' + uid
             yield relationships_item
+            yield Request(url="https://weibo.cn/%s/info" % uid, callback=self.parse_information)
 
     def parse_fans(self, response):
         """
@@ -244,6 +245,7 @@ class WeiboSpider(Spider):
             relationships_item["followed_id"] = ID
             relationships_item["_id"] = uid + '-' + ID
             yield relationships_item
+            yield Request(url="https://weibo.cn/%s/info" % uid, callback=self.parse_information)
 
     def parse_comment(self, response):
         # 如果是第1页，一次性获取后面的所有页
