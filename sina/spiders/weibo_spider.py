@@ -30,6 +30,7 @@ class WeiboSpider(Spider):
         information_item['crawl_time'] = int(time.time())
         selector = Selector(response)
         information_item['_id'] = re.findall('(\d+)/info', response.url)[0]
+        icon = selector.xpath('body/div[@class="c"]/img/@src').get()
         text1 = ";".join(selector.xpath('body/div[@class="c"]//text()').extract())  # 获取标签里的所有text()
         nick_name = re.findall('昵称;?[：:]?(.*?);', text1)
         gender = re.findall('性别;?[：:]?(.*?);', text1)
@@ -67,6 +68,8 @@ class WeiboSpider(Spider):
             information_item["authentication"] = authentication[0].replace(u"\xa0", "")
         if labels and labels[0]:
             information_item["labels"] = labels[0].replace(u"\xa0", ",").replace(';', '').strip(',')
+        if icon:
+            information_item["icon"] = icon
         request_meta = response.meta
         request_meta['item'] = information_item
         yield Request(self.base_url + '/u/{}'.format(information_item['_id']),
@@ -146,7 +149,7 @@ class WeiboSpider(Spider):
 
                 images = tweet_node.xpath('.//img[@alt="图片"]/@src')
                 if images:
-                    tweet_item['image_url'] = images[0]
+                    tweet_item['image_url'] = images
 
                 videos = tweet_node.xpath('.//a[contains(@href,"https://m.weibo.cn/s/video/show?object_id=")]/@href')
                 if videos:
@@ -175,8 +178,8 @@ class WeiboSpider(Spider):
                     yield tweet_item
 
                 # 抓取该微博的评论信息
-                comment_url = self.base_url + '/comment/' + tweet_item['weibo_url'].split('/')[-1] + '?page=1'
-                yield Request(url=comment_url, callback=self.parse_comment, meta={'weibo_url': tweet_item['weibo_url']})
+                # comment_url = self.base_url + '/comment/' + tweet_item['weibo_url'].split('/')[-1] + '?page=1'
+                # yield Request(url=comment_url, callback=self.parse_comment, meta={'weibo_url': tweet_item['weibo_url']})
 
             except Exception as e:
                 self.logger.error(e)

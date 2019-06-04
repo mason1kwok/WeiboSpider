@@ -39,7 +39,7 @@ class InformationItem(Item):
     person_url = Field()  # 首页链接
     labels = Field()  # 标签
     crawl_time = Field()  # 抓取时间戳
-
+    icon = Field() # 头像
 
 class RelationshipsItem(Item):
     """ 用户关系，只保留与关注的关系 """

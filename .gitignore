@@ -1,2 +1,5 @@
 ghostdriver.log
 captcha.png
+.vscode
+__pycache__
+.python-version
