@@ -84,7 +84,7 @@ def parse_img(url, img_from, from_id):
 if __name__ == "__main__":
 
     infos = sina_db['Information'].find({'icon':{'$ne': None}, 'face_state': None})
-    while infos is not None:
+    while infos.count() > 0:
         for info in infos:
             url = info.get('icon')
             if url is None:
