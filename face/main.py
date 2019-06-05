@@ -97,13 +97,15 @@ if __name__ == "__main__":
 
     # for info in sina_db['Information'].find():
     #     print(info)
-
-    for tweet in sina_db['Tweets'].find({'image_url':{'$ne': None}, 'face_state': None}).sort('crawl_time', -1).limit(100):
-        for img in tweet.get('image_url', []):
-            img = img.replace("wap180", "large")
-            print(img)
-            state = parse_img(img, "SINA_TWEET", tweet.get("_id"))
-            sina_db['Tweets'].update_one({"_id": tweet.get("_id")}, {'$set': {"face_state": state}})
+    tweets = sina_db['Tweets'].find({'image_url':{'$ne': None}, 'face_state': None})
+    while tweets.count() > 0:
+        for tweet in tweets:
+            for img in tweet.get('image_url', []):
+                img = img.replace("wap180", "large")
+                print(img)
+                state = parse_img(img, "SINA_TWEET", tweet.get("_id"))
+                sina_db['Tweets'].update_one({"_id": tweet.get("_id")}, {'$set': {"face_state": state}})
+        tweets = sina_db['Tweets'].find({'image_url':{'$ne': None}, 'face_state': None})
 
     if connection_db is not None:
         connection_db.close()
