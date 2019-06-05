@@ -16,7 +16,7 @@ def url2img(url):
 
 def url2faces(url):
     img = url2img(url)
-    if not img.any():
+    if img is None or len(img) <= 0:
         return []
     detected_faces = face_detector(img, 1)
     faces = []
