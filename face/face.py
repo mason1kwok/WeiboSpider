@@ -12,7 +12,8 @@ def url2img(url):
     resp = urllib.request.urlopen(url)
     try:
         img = numpy.asarray(bytearray(resp.read()), dtype='uint8')
-    except:
+    except Exception as e:
+        print(e)
         return None
     return cv2.imdecode(img, cv2.IMREAD_COLOR)
 
