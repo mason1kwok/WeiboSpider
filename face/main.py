@@ -32,10 +32,10 @@ def parse_img(url, img_from, from_id):
                 ','.join(str(s) for s in encodings[0][64:128]),
                 threshold
             )+ \
-            "ORDER BY sqrt((CUBE(array[{}]) <-> vec_low) + (CUBE(array[{}]) <-> vec_high)) ASC LIMIT 1".format(
-            ','.join(str(s) for s in encodings[0][0:64]),
-            ','.join(str(s) for s in encodings[0][64:128]),
-        )
+                "ORDER BY sqrt((CUBE(array[{}]) <-> vec_low) + (CUBE(array[{}]) <-> vec_high)) ASC LIMIT 1".format(
+                ','.join(str(s) for s in encodings[0][0:64]),
+                ','.join(str(s) for s in encodings[0][64:128]),
+            )
             psql_db.execute(query)
             row = psql_db.fetchone()
             print("query:", row)
@@ -100,11 +100,14 @@ if __name__ == "__main__":
     tweets = sina_db['Tweets'].find({'image_url':{'$ne': None}, 'face_state': None})
     while tweets.count() > 0:
         for tweet in tweets:
+            state = FaceState.NoneFaced
             for img in tweet.get('image_url', []):
                 img = img.replace("wap180", "large")
                 print(img)
-                state = parse_img(img, "SINA_TWEET", tweet.get("_id"))
-                sina_db['Tweets'].update_one({"_id": tweet.get("_id")}, {'$set': {"face_state": state}})
+                tmp = parse_img(img, "SINA_TWEET", tweet.get("_id"))
+                if tmp == FaceState.Faced:
+                    state = tmp
+            sina_db['Tweets'].update_one({"_id": tweet.get("_id")}, {'$set': {"face_state": state}})
         tweets = sina_db['Tweets'].find({'image_url':{'$ne': None}, 'face_state': None})
 
     if connection_db is not None:
