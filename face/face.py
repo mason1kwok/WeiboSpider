@@ -10,7 +10,10 @@ face_detector = dlib.get_frontal_face_detector()
 
 def url2img(url):
     resp = urllib.request.urlopen(url)
-    img = numpy.asarray(bytearray(resp.read()), dtype='uint8')
+    try:
+        img = numpy.asarray(bytearray(resp.read()), dtype='uint8')
+    except:
+        return None
     return cv2.imdecode(img, cv2.IMREAD_COLOR)
 
 
