@@ -76,7 +76,7 @@ def parse_img(url, img_from, from_id):
                 '_created': int(time.time()),
                 '_updated': int(time.time())
             }
-            db["Images"].insert(image)
+            db["Images"].insert_one(image)
         state = FaceState.Faced
     return state
     
