@@ -33,7 +33,7 @@ def parse_img(url, img_from, from_id):
                 ','.join(str(s) for s in encodings[0][64:128]),
                 threshold,
             ) + \
-                "ORDER BY sqrt(power(CUBE(array[{}]) <-> vec_low, 2) + power(CUBE(array[{}]) <-> vec_high, 2)) <-> vec_high) ASC LIMIT 1".format(
+                "ORDER BY sqrt(power(CUBE(array[{}]) <-> vec_low, 2) + power(CUBE(array[{}]) <-> vec_high, 2)) ASC LIMIT 1".format(
                     ','.join(str(s) for s in encodings[0][0:64]),
                     ','.join(str(s) for s in encodings[0][64:128]),
                 )
