@@ -25,23 +25,24 @@ def parse_img(url, img_from, from_id):
     state = FaceState.NoneFaced
     faces = face.url2faces(url)
     vids = []
+
     for encodings in faces:
         if len(encodings) > 0:
-            query = "SELECT id FROM vectors WHERE sqrt(power(CUBE(array[{}]) <-> vec_low, 2) + power(CUBE(array[{}]) <-> vec_high, 2)) <= {}".format(
+            query = "SELECT id FROM vectors WHERE sqrt(power(CUBE(array[{}]) <-> vec_low, 2) + power(CUBE(array[{}]) <-> vec_high, 2)) <= {} ".format(
                 ','.join(str(s) for s in encodings[0][0:64]),
                 ','.join(str(s) for s in encodings[0][64:128]),
-                threshold
-            )+ \
-                "ORDER BY sqrt((CUBE(array[{}]) <-> vec_low) + (CUBE(array[{}]) <-> vec_high)) ASC LIMIT 1".format(
-                ','.join(str(s) for s in encodings[0][0:64]),
-                ','.join(str(s) for s in encodings[0][64:128]),
-            )
+                threshold,
+            ) + \
+                "ORDER BY sqrt(power(CUBE(array[{}]) <-> vec_low, 2) + power(CUBE(array[{}]) <-> vec_high, 2)) <-> vec_high) ASC LIMIT 1".format(
+                    ','.join(str(s) for s in encodings[0][0:64]),
+                    ','.join(str(s) for s in encodings[0][64:128]),
+                )
             psql_db.execute(query)
             row = psql_db.fetchone()
             print("query:", row)
             if row is not None and row[0] not in vids:
                 vids.append(row[0])
-            else:
+            elif len(faces) <= 1:
                 query = "INSERT INTO vectors (file, vec_low, vec_high) VALUES ('{}', CUBE(array[{}]), CUBE(array[{}])) RETURNING id".format(
                     url,
                     ','.join(str(s) for s in encodings[0][0:64]),
