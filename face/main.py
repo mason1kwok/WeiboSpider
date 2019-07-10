@@ -10,6 +10,7 @@ from enum import IntEnum
 class FaceState(IntEnum):
     Faced = 1
     NoneFaced = 2
+    Incomplete = 3
 
 client = pymongo.MongoClient(settings.MONGO_URI)
 sina_db = client[settings.SINA_DB_NAME]
@@ -51,6 +52,8 @@ def parse_img(url, img_from, from_id):
                 psql_db.execute(query)
                 vids.append(psql_db.fetchone()[0])
                 print(query, vids)
+            else:
+                state = FaceState.Incomplete
     if len(vids) > 0:
         relation = {"from": img_from, "from_id": from_id}
         m = hashlib.md5()
@@ -77,7 +80,8 @@ def parse_img(url, img_from, from_id):
                 '_updated': int(time.time())
             }
             db["Images"].insert_one(image)
-        state = FaceState.Faced
+        if state != FaceState.Incomplete:
+            state = FaceState.Faced
     return state
     
 
