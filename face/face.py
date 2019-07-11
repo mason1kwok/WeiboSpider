@@ -9,13 +9,13 @@ import os
 face_detector = dlib.get_frontal_face_detector()
 
 def url2img(url):
-    resp = urllib.request.urlopen(url)
     try:
+        resp = urllib.request.urlopen(url)
         img = numpy.asarray(bytearray(resp.read()), dtype='uint8')
+        return cv2.imdecode(img, cv2.IMREAD_COLOR)
     except Exception as e:
         print(e)
         return None
-    return cv2.imdecode(img, cv2.IMREAD_COLOR)
 
 
 def url2faces(url):
