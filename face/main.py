@@ -83,11 +83,8 @@ def parse_img(url, img_from, from_id):
         if state != FaceState.Incomplete:
             state = FaceState.Faced
     return state
-    
 
-
-if __name__ == "__main__":
-
+def parseHead():
     infos = sina_db['Information'].find({'icon':{'$ne': None}, 'face_state': None})
     while infos.count() > 0:
         for info in infos:
@@ -100,6 +97,7 @@ if __name__ == "__main__":
             sina_db['Information'].update_one({"_id": info.get("_id")}, {'$set': {"face_state": state}})
         infos = sina_db['Information'].find({'icon':{'$ne': None}, 'face_state': None})
 
+def parseImage():
     # for info in sina_db['Information'].find():
     #     print(info)
     tweets = sina_db['Tweets'].find({'image_url':{'$ne': None}, 'face_state': None})
@@ -114,6 +112,21 @@ if __name__ == "__main__":
                     state = tmp
             sina_db['Tweets'].update_one({"_id": tweet.get("_id")}, {'$set': {"face_state": state}})
         tweets = sina_db['Tweets'].find({'image_url':{'$ne': None}, 'face_state': None})
+
+if __name__ == "__main__":
+
+    index = 0
+    while True:
+        try:
+            parseHead()
+            parseImage()
+            index = 0
+        except Exception as e:
+            print(e)
+            if index > 10:
+                break
+            time.sleep(1)
+            index += 1
 
     if connection_db is not None:
         connection_db.close()
